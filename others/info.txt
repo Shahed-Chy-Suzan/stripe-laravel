@@ -1,6 +1,8 @@
-================================================================================
-         //*********	Stripe Payment Gateway in Laravel 9	*********//
-================================================================================
+
+
+//=========================================================================================
+						//*****	Stripe Payment Gateway in Laravel 9	*****//
+//=========================================================================================
 
 	- github: https://github.com/Shahed-Chy-Suzan/stripe-laravel
 	- resourche: https://www.positronx.io/integrate-stripe-payment-gateway-in-laravel-application/
@@ -19,3 +21,565 @@
 	-3- php artisan make:controller StripeController
 	
 	-4- 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+//=====================================================================================================
+							//------ Payment Gateway (Stripe) 	//from Ecommerce -------//
+//=====================================================================================================
+			//------------ Payment Gateway (Stripe) ------------------
+			
+				-- github: https://github.com/Shahed-Chy-Suzan/stripe-laravel
+				-- resourche: https://www.positronx.io/integrate-stripe-payment-gateway-in-laravel-application/
+
+				//1st e amader k "stripe.com" e giye account kore "dashboard" e jethe hobe,----> then right_side/dhan_pashe Navbar e niche "developer" option e jabo,okhane "developer" option er dropdown e "Api Keys" name e ekta option asbe 1st e, ota the gele amra ekta "secret key" & ekta "publishable key" dekte pab( https://dashboard.stripe.com/test/apikeys ).....>
+
+				//......er sobar aghe amader k obosshoy stripe ta amader project e install kore nithe hobe,ei jonno amra "dhan pashe Navbar theke(documentaion er vitor ache) "Development/API/Libraries" e jabo( https://stripe.com/docs/libraries ), Okhane "Server-side libraries" heading diye "php" er jonno "CMD_command" ache (composer require stripe/stripe-php) eta diye project ta install kore nithe hobe,,...//
+
+				//--account khola hoye gele porer bar theke amra "stripe.com" e jabo,-->->(okhan theke amader checkout er form ta lagbe,tai)--->"dan pashe Navbar er Development option(documentaion er vitor ache) e jabo(dashboard er vitor na)--->then otar niche "stripe's UI libraries" option e gelei onek form er code+demo pabo( https://stripe.com/docs/stripe-js ) ,--> oikhaner sob coder er HTML code copy kore ene amader "stripe.blade.php" te "pay now" er niche form anar jonno paste korechi, code er opore ekta LINK(<script src="https://js.stripe.com/v3/"></script>) ache oitao must nithe hobe,niye file er opore add korechi(ekhane amra app.blade.php te add korechi),CSS code gulao lagbe,same vabe JavaScript code gulao add korte hobe,->chaile oi same page ei code sob paste korte pari OR onno kothao paste kore link ta ei page e add kore dithe pari..//ekhan emra same page ei paste korechi (html mane stripe.blade.php file er opore- (<style type="text/css"> CSS CODE here </style>) diye css code likhechi,///& oi file er niche same vabe ( <script type="text/javascript"> JavaScript CODE here </script> ) diye JavaScript code likhchi/add/paste kore diyeci,,....//css design e extra vabe  width: 100%; add koreci..
+
+				//JavaScript code e amader "publishable key" ta copy kore ene paste kore dithe hobe,....//ekon amadr "Controller" e Api charge er code ta use korte hobe, ei code gula paowar jonno amra stripe er website er Danpashe Navbar er "Payment" option e jabo, then niche dekbo "ABOUT the APIS" ache otar dropdown e "Older APIs"  er moddhe giye "Charges" e jabo,,okhane theke "Storing information in metadata"( https://stripe.com/docs/payments/charges-api ) er code er moddhe theke "PHP" option er code gula nibo,,ei code gula amder Controller "PaymentController.php" te method er vitor paste kore dibo,...
+
+				//--"stripe.com/dashboard/Developers/API keys" er moddhe amra j 2ta(Publishable key  Secret key) paitam,tar moddhe ekn "secrey key" ta amader "ProductController" er stripe er j code copy kore niye aschilam otar "setApiKey" er moddhe paste("Storing_information_in_metadata" theke j code copy kore anchi okhane emitei ei "setApiKey" ta deya ache automatic) kore dibo(\Stripe\Stripe::setApiKey( 'sk_test_H0qtGLfjssXr1BiEL4UoEi9k00dXk3hA6f'); ) ,...//
+
+				//$charge = \Stripe\Charge::create([
+							'amount' => $total*100,
+							'currency' => 'usd',
+							'description' => 'Learn Hunter details',
+							'source' => $token,
+							'metadata' => ['order_id' => uniqid()],
+						]);
+				//--eta "ProductController" er code er samanno part, ekhane amra "amount"=>999; default vabe deya thake,ekhane 999 ta "cent" e count kore stripe,ekn eta k "Doller" e count korar jonno sobsomoy etar sathe amader k 100 multiply kore dithe hobe(for Example: 'amount' => $total*100),....//
+				//--Stripe input box tai check korar jonoo use hoy 4242 4242 4242 4242 (mm/yy cvc zip == 11/12 123 12321) ...ekhane zip code obosshoy "5digit" er dithe hobe,
+				//--"Pay Now" mane taka pay hoyeche kina ta amra chaile check korte pari,ejonno amra "strip.com/dashboard/Payments" ( https://dashboard.stripe.com/test/payments ) e gele dekte pabo j amader Pay kora amount ta + description+date sob show korteche && "SUCCEEDED" likha ta show korteche, jodi "success" na hoyto taile "incomplete" likha asto...
+				//ekn amader 3ta table lagbe,,
+				(order Table==ki ki order holo(id,user_id,payment_id,paying_amount,bln_transection,stripe_order_id,subtotal,shipping,,subtotal,shipping,vat,total,payment_type,status,month,date,year)..,,,order_details Table==details thakbe order er(id,product_id,product_name,color,size,quantity,singleprice,totalprice),,,shipping Table==kar kache jabe(id,order_id,ship_name,ship_email,ship_phone,ship_address),)...//
+
+
+
+			//--------------Payment.blade.php-----------
+			@extends('layouts.app')
+			@section('content')
+
+			<link rel="stylesheet" type="text/css" href="{{ asset('public/frontend/styles/contact_styles.css')}}">
+			@php
+				$setting=DB::table('settings')->first();
+				$charge=$setting->shipping_charge;
+
+			@endphp
+				<div class="contact_form">
+					<div class="container">
+						<div class="row">
+							<div class="col-lg-7 "  style="border-right: 1px solid grey; padding: 20px;">
+								<div class="cart_container">
+									<div class="contact_form_title text-center">Cart Products</div>
+									<div class="cart_items">
+										<ul class="cart_list">
+										@foreach($cart as $row)
+											<li class="cart_item clearfix">
+
+												<div class="cart_item_info d-flex flex-md-row flex-column justify-content-between">
+													<div class="cart_item_name cart_info_col">
+														<div class="cart_item_title">Name</div>
+														<div class="cart_item_text">{{ $row->name }}</div>
+													</div>
+													@if($row->options->color == NULL)
+													@else
+													<div class="cart_item_color cart_info_col">
+														<div class="cart_item_title">Color</div>
+														<div class="cart_item_text">
+																{{ $row->options->color }}
+														</div>
+													</div>
+													@endif
+													@if($row->options->size == NULL)
+													@else
+													<div class="cart_item_color cart_info_col">
+														<div class="cart_item_title">Size</div>
+														<div class="cart_item_text">
+																{{ $row->options->size }}
+														</div>
+													</div>
+													@endif
+
+
+
+													<div class="cart_item_quantity cart_info_col">
+														<div class="cart_item_title">Quantity</div>
+														{{ $row->qty }}
+													</div>
+													<div class="cart_item_price cart_info_col">
+														<div class="cart_item_title">Price</div>
+														<div class="cart_item_text">${{ $row->price }}</div>
+													</div>
+													<div class="cart_item_total cart_info_col">
+														<div class="cart_item_title">Total</div>
+														<div class="cart_item_text">${{ $row->price * $row->qty }}</div>
+													</div>
+
+												</div>
+											</li>
+											@endforeach
+										</ul>
+									</div>
+									   <br><br><hr>
+
+									<ul class="list-group col-lg-8" >
+										  @if(Session::has('coupon'))
+											   <li class="list-group-item">Subtotal :  <span style="float: right;"> $ {{ Session::get('coupon')['balance'] }}</span> </li>
+												<li class="list-group-item">Coupon : ({{   Session::get('coupon')['name'] }})  <span style="float: right;"> $  {{ Session::get('coupon')['discount'] }} </span> </li>
+											@else
+											  <li class="list-group-item">Subtotal :  <span style="float: right;"> $ {{ Cart::Subtotal() }}</span> </li>
+											@endif
+
+
+
+										  <li class="list-group-item">Shipping Charge: <span style="float: right;"> $ {{ $charge }}</span></li>
+										  <li class="list-group-item">Vat :  <span style="float: right;"> 0</span></li>
+										  @if(Session::has('coupon'))
+			<!--ekhane 'a non well formed numeric value entered' problem ta asteche,tai comment kore dechi-->
+										  {{-- <li class="list-group-item">Total:  <span style="float: right;"> $ {{ Session::get('coupon')['balance'] + $charge }}</span> </li> --}}
+										  <li class="list-group-item">Total:  <span style="float: right;"> $ {{ Session::get('coupon')['balance'] }}</span> </li>
+										  @else
+			<!--ekhane 'a non well formed numeric value entered' problem ta asteche,tai comment kore dechi-->
+												<li class="list-group-item">Total:  <span style="float: right;">$ {{ Cart::Subtotal() }} </span> </li>
+											   {{-- <li class="list-group-item">Total:  <span style="float: right;">$ {{ Cart::Subtotal() + $charge }} </span> </li> --}}
+										  @endif
+									</ul>
+								</div>
+							</div>
+
+							 <div class="col-lg-5 " style=" padding: 20px;">
+								<div class="contact_form_container">
+									<div class="contact_form_title text-center">Shipping Address</div>
+
+									<form action="{{ route('payment.process') }}" id="contact_form" method="post">
+										@csrf
+										<div class="form-group">
+											<label for="exampleInputEmail1">Full Name </label>
+											<input type="text" class="form-control"  aria-describedby="emailHelp" placeholder="Full Name " name="name" required="">
+										</div>
+										<div class="form-group">
+											<label for="exampleInputEmail1">Phone </label>
+											<input type="text" class="form-control " name="phone"  aria-describedby="emailHelp" placeholder="Phone "  required="">
+										</div>
+										<div class="form-group">
+											<label for="exampleInputEmail1">Email </label>
+											<input type="text" class="form-control " name="email"   aria-describedby="emailHelp" placeholder="Email " required="">
+										</div>
+										<div class="form-group">
+											<label for="exampleInputEmail1">Address</label>
+											<input type="text" class="form-control"  aria-describedby="emailHelp" placeholder="address" name="address" required="">
+										</div>
+										<div class="form-group">
+											<label for="exampleInputEmail1">City</label>
+											<input type="text" class="form-control"  aria-describedby="emailHelp" placeholder="city" name="city" required="">
+										</div>
+										<div class="contact_form_title text-center">Payment By</div>
+									   <div class="form-group">
+											<ul class="logos_list " >
+														<li><input type="radio" name="payment" value="stripe"> <img src="{{ asset('public/frontend/images/mastercard.png') }}" style="width: 100px; height: 60px;"></li>
+														<li><input type="radio" name="payment" value="paypal"> <img src="{{ asset('public/frontend/images/paypal.png') }}" style="width: 100px;"></li>
+														<li><input type="radio" name="payment" value="ideal"> <img src="{{ asset('public/frontend/images/mollie.png') }}" style="width: 100px; height: 80px;"></li>
+											 </ul>
+										</div><br>
+										<div class="contact_form_button">
+											<button type="submit" class="btn btn-info">Pay Now</button>
+										</div>
+									</form>
+
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="panel"></div>
+				</div>
+
+			@endsection
+
+
+
+			//---------------------route---------------------------
+						Route::post('user/payment/process/','PaymentController@payment')->name('payment.process');
+						Route::post('user/stripe/charge/','PaymentController@STripeCharge')->name('stripe.charge');
+
+			//---------------PaymentController.php--------------
+			<?php
+
+			namespace App\Http\Controllers;
+
+			use Illuminate\Http\Request;
+			use DB;
+			use Auth;
+			use Cart;
+			use Session;
+			class PaymentController extends Controller
+			{
+				 public function __construct()
+				{
+					$this->middleware('auth');
+				}
+
+				public function payment(Request $request)
+				{
+					$data=array();
+					$data['name']=$request->name;
+					$data['email']=$request->email;
+					$data['phone']=$request->phone;
+					$data['address']=$request->address;
+					$data['city']=$request->city;
+					$data['payment']=$request->payment;
+
+					if ($request->payment == 'stripe') {
+						//stripe payment pages
+						return view('pages.payment.stripe',compact('data'));
+
+					}elseif($request->payment == 'paypal'){
+
+					}elseif($request->payment == 'ideal'){
+
+					}else{
+					echo"handcash";
+					}
+
+				}
+
+
+
+				public function STripeCharge(Request $request)
+				{
+					   $total=$request->total;
+						// Set your secret key: remember to change this to your live secret key in production
+						// See your keys here: https://dashboard.stripe.com/account/apikeys
+						\Stripe\Stripe::setApiKey('sk_test_H0qtGLfjssXr1BiEL4UoEi9k00dXk3hA6f');
+
+						// Token is created using Checkout or Elements!
+						// Get the payment token ID submitted by the form:
+						$token = $_POST['stripeToken'];
+
+						$charge = \Stripe\Charge::create([
+			//ekhane 'a non well formed numeric value entered' problem ta asteche,tai comment kore dechi
+							'amount' => 999*100,
+							//'amount' => $total*100,
+							'currency' => 'usd',
+							'description' => 'Learn Hunter details',
+							'source' => $token,
+							'metadata' => ['order_id' => uniqid()],
+						]);
+						//dd($charge);
+
+						$data=array();
+						$data['user_id']=Auth::id();
+						$data['payment_id']=$charge->payment_method;
+						$data['paying_amount']=$charge->amount/100;
+						$data['blnc_transection']=$charge->balance_transaction;
+						$data['stripe_order_id']=$charge->metadata->order_id;
+						$data['shipping']=$request->shipping;
+						$data['vat']=$request->vat;
+						$data['total']=$request->total;
+						$data['payment_type']=$request->payment_type;
+						 if (Session::has('coupon')) {
+							 $data['subtotal']=Session::get('coupon')['balance'];
+						 }else{
+							  $data['subtotal']=Cart::Subtotal() ;
+						}
+						$data['status']=0;
+						$data['date']=date('d-m-y');
+						$data['month']=date('F');
+						$data['year']=date('Y');
+						$order_id=DB::table('orders')->insertGetId($data);	//--insert + get last Inserted order's id--
+
+					// insert shipping details table
+						$shipping=array();
+						$shipping['order_id']=$order_id;
+						$shipping['ship_name']=$request->ship_name;
+						$shipping['ship_email']=$request->ship_email;
+						$shipping['ship_phone']=$request->ship_phone;
+						$shipping['ship_address']=$request->ship_address;
+						$shipping['ship_city']=$request->ship_city;
+						DB::table('shipping')->insert($shipping);
+
+					//insert data into orderdeatils
+						$content=Cart::content();
+						$details=array();
+						foreach ($content as $row) {
+							$details['order_id']= $order_id;
+							$details['product_id']=$row->id;
+							$details['product_name']=$row->name;
+							$details['color']=$row->options->color;
+							$details['size']=$row->options->size;
+							$details['quantity']=$row->qty;
+							$details['singleprice']=$row->price;
+							$details['totalprice']=$row->qty * $row->price;
+
+							DB::table('order_details')->insert($details);
+						}
+
+						Cart::destroy();
+							if (Session::has('coupon')) {
+							Session::forget('coupon');
+						}
+
+						$notification=array(
+										'message'=>'Successfully Done',
+										'alert-type'=>'success'
+									);
+							return Redirect()->to('/')->with($notification);
+				}
+			}
+
+
+			//------------------------stripe.blade.php-----------------
+			@extends('layouts.app')
+			@section('content')
+
+			<link rel="stylesheet" type="text/css" href="{{ asset('public/frontend/styles/contact_styles.css')}}">
+
+
+			<style type="text/css">
+				/**
+				 * The CSS shown here will not be introduced in the Quickstart guide, but shows
+				 * how you can use CSS to style your Element's container.
+				 */
+				.StripeElement {
+				  box-sizing: border-box;
+
+				  height: 40px;
+				  width: 100%;
+
+				  padding: 10px 12px;
+
+				  border: 1px solid transparent;
+				  border-radius: 4px;
+				  background-color: white;
+
+				  box-shadow: 0 1px 3px 0 #e6ebf1;
+				  -webkit-transition: box-shadow 150ms ease;
+				  transition: box-shadow 150ms ease;
+				}
+
+				.StripeElement--focus {
+				  box-shadow: 0 1px 3px 0 #cfd7df;
+				}
+
+				.StripeElement--invalid {
+				  border-color: #fa755a;
+				}
+
+				.StripeElement--webkit-autofill {
+				  background-color: #fefde5 !important;
+				}
+			</style>
+
+			@php
+				$setting=DB::table('settings')->first();
+				$charge=$setting->shipping_charge;
+				$cart=Cart::content();
+			@endphp
+
+				<div class="contact_form">
+					<div class="container">
+						<div class="row">
+							<div class="col-lg-7 "  style="border-right: 1px solid grey; padding: 20px;">
+								<div class="cart_container">
+									<div class="contact_form_title text-center">Cart Products</div>
+									<div class="cart_items">
+										<ul class="cart_list">
+										@foreach($cart as $row)
+											<li class="cart_item clearfix">
+
+												<div class="cart_item_info d-flex flex-md-row flex-column justify-content-between">
+													<div class="cart_item_name cart_info_col">
+
+													<img src="{{ asset($row->options->image) }}" style="height: 60px;">
+													</div>
+													<div class="cart_item_name cart_info_col">
+														<div class="cart_item_text">{{ $row->name }}</div>
+													</div>
+													@if($row->options->color == NULL)
+													@else
+													<div class="cart_item_color cart_info_col">
+														<div class="cart_item_text">
+																{{ $row->options->color }}
+														</div>
+													</div>
+													@endif
+													@if($row->options->size == NULL)
+													@else
+													<div class="cart_item_color cart_info_col">
+														<div class="cart_item_text">
+																{{ $row->options->size }}
+														</div>
+													</div>
+													@endif
+
+													<div class="cart_item_quantity cart_info_col">
+														{{ $row->qty }}
+													</div>
+													<div class="cart_item_price cart_info_col">
+														<div class="cart_item_text">${{ $row->price }}</div>
+													</div>
+													<div class="cart_item_total cart_info_col">
+														<div class="cart_item_text">${{ $row->price * $row->qty }}</div>
+													</div>
+
+												</div>
+											</li>
+											@endforeach
+										</ul>
+									</div>
+									   <br><br><hr>
+
+									<ul class="list-group col-lg-8" >
+										  @if(Session::has('coupon'))
+											   <li class="list-group-item">Subtotal :  <span style="float: right;"> $ {{ Session::get('coupon')['balance'] }}</span> </li>
+												<li class="list-group-item">Coupon : ({{   Session::get('coupon')['name'] }})  <span style="float: right;"> $  {{ Session::get('coupon')['discount'] }} </span> </li>
+											@else
+											  <li class="list-group-item">Subtotal :  <span style="float: right;"> $ {{ Cart::Subtotal() }}</span> </li>
+											@endif
+
+
+
+										  <li class="list-group-item">Shipping Charge: <span style="float: right;"> $ {{ $charge }}</span></li>
+										  <li class="list-group-item">Vat :  <span style="float: right;"> 0</span></li>
+										  @if(Session::has('coupon'))
+			<!--ekhane 'a non well formed numeric value entered' problem ta asteche,tai comment kore dechi-->
+										  {{-- <li class="list-group-item">Total:  <span style="float: right;"> $ {{ Session::get('coupon')['balance'] + $charge }}</span> </li> --}}
+										  <li class="list-group-item">Total:  <span style="float: right;"> $ {{ Session::get('coupon')['balance'] }}</span> </li>
+										  @else
+			<!--ekhane 'a non well formed numeric value entered' problem ta asteche,tai comment kore dechi-->
+											{{-- <li class="list-group-item">Total:  <span style="float: right;">$ {{ Cart::Subtotal() + $charge }} </span> </li> --}}
+											<li class="list-group-item">Total:  <span style="float: right;">$ {{ Cart::Subtotal() }} </span> </li>
+										  @endif
+									</ul>
+								</div>
+							</div>
+
+							 <div class="col-lg-5 " style=" padding: 20px;">
+								<div class="contact_form_container">
+									<div class="contact_form_title text-center">Pay Now </div>
+
+									<form action="{{ route('stripe.charge') }}" method="post" id="payment-form" style="border: 1px solid grey; padding: 20px;">
+										@csrf
+									  <div class="form-row">
+										<label for="card-element">
+										  Credit or debit card
+										</label>
+										<div id="card-element">
+										  <!-- A Stripe Element will be inserted here. -->
+										</div>
+
+										<!-- Used to display form errors. -->
+										<div id="card-errors" role="alert"></div>
+									  </div><br>
+
+					{{-------------------- extra data (passing to PaymentController to catch value) ---------------------------}}
+									<input type="hidden" name="shipping" value="{{ $charge }}">
+									<input type="hidden" name="vat" value="0">
+			<!--ekhane 'a non well formed numeric value entered' problem ta asteche,tai comment kore dechi-->
+									{{-- <input type="hidden" name="total" value="{{ Cart::Subtotal() + $charge }}"> --}}
+									<input type="hidden" name="total" value="{{ Cart::Subtotal() }}">
+										 {{-- shipping details pass --}}
+									 <input type="hidden" name="ship_name" value="{{ $data['name'] }}">
+									 <input type="hidden" name="ship_email" value="{{ $data['email'] }}">
+									 <input type="hidden" name="ship_phone" value="{{ $data['phone'] }}">
+									 <input type="hidden" name="ship_address" value="{{ $data['address'] }}">
+									 <input type="hidden" name="ship_city" value="{{ $data['city'] }}">
+									 <input type="hidden" name="payment_type" value="{{ $data['payment'] }}">
+						{{--------------------End extra data (passing) ---------------------------}}
+									  <button class="btn btn-info">Pay Now</button>
+									</form>
+
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="panel"></div>
+				</div>
+
+
+
+			<script type="text/javascript">
+				// Create a Stripe client.
+			var stripe = Stripe('pk_test_82s2EmEhdxhApVUru4iz6S9t00bLFwI7oO');
+
+			// Create an instance of Elements.
+			var elements = stripe.elements();
+
+			// Custom styling can be passed to options when creating an Element.
+			// (Note that this demo uses a wider set of styles than the guide below.)
+			var style = {
+			  base: {
+				color: '#32325d',
+				fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+				fontSmoothing: 'antialiased',
+				fontSize: '16px',
+				'::placeholder': {
+				  color: '#aab7c4'
+				}
+			  },
+			  invalid: {
+				color: '#fa755a',
+				iconColor: '#fa755a'
+			  }
+			};
+
+			// Create an instance of the card Element.
+			var card = elements.create('card', {style: style});
+
+			// Add an instance of the card Element into the `card-element` <div>.
+			card.mount('#card-element');
+
+			// Handle real-time validation errors from the card Element.
+			card.addEventListener('change', function(event) {
+			  var displayError = document.getElementById('card-errors');
+			  if (event.error) {
+				displayError.textContent = event.error.message;
+			  } else {
+				displayError.textContent = '';
+			  }
+			});
+
+			// Handle form submission.
+			var form = document.getElementById('payment-form');
+			form.addEventListener('submit', function(event) {
+			  event.preventDefault();
+
+			  stripe.createToken(card).then(function(result) {
+				if (result.error) {
+				  // Inform the user if there was an error.
+				  var errorElement = document.getElementById('card-errors');
+				  errorElement.textContent = result.error.message;
+				} else {
+				  // Send the token to your server.
+				  stripeTokenHandler(result.token);
+				}
+			  });
+			});
+
+			// Submit the form with the token ID.
+			function stripeTokenHandler(token) {
+			  // Insert the token ID into the form so it gets submitted to the server
+			  var form = document.getElementById('payment-form');
+			  var hiddenInput = document.createElement('input');
+			  hiddenInput.setAttribute('type', 'hidden');
+			  hiddenInput.setAttribute('name', 'stripeToken');
+			  hiddenInput.setAttribute('value', token.id);
+			  form.appendChild(hiddenInput);
+
+			  // Submit the form
+			  form.submit();
+			}
+			</script>
+			@endsection
+			//-------------------end Stripe----------------
+
+
+//================================================================================================================================
+//================================================================================================================================
