@@ -45,6 +45,21 @@
                     </svg>
                 </div>
 
+
+<!--------------------------- fgfg ---------------------------------------------->
+
+                <h2 class="text-gray-900 dark:text-white">Stripe Payment Gateway Integration</h2>
+                <a href="{{url('stripe-payment')}}">goto stripe payment page</a>
+
+<!-------------------------- fgfg ----------------------------------------------->
+
+
+
+
+
+
+
+
                 <div class="mt-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                     <div class="grid grid-cols-1 md:grid-cols-2">
                         <div class="p-6">

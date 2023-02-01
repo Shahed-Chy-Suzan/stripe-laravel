@@ -1,0 +1,21 @@
+================================================================================
+         //*********	Stripe Payment Gateway in Laravel 9	*********//
+================================================================================
+
+	- github: https://github.com/Shahed-Chy-Suzan/stripe-laravel
+	- resourche: https://www.positronx.io/integrate-stripe-payment-gateway-in-laravel-application/
+	
+	
+	-1- composer require stripe/stripe-php
+	-2- 
+			//------ in .env ----------
+					Publishable key		==	pk_test_82s2EmEhdxhApVUru4iz6S9t00bLFwI7oO
+					Secret key				==	sk_test_H0qtGLfjssXr1BiEL4UoEi9k00dXk3hA6f
+			
+	//------------------web.php----------------------
+			Route::get('/stripe-payment', [StripeController::class, 'handleGet']);
+			Route::post('/stripe-payment', [StripeController::class, 'handlePost'])->name('stripe.payment');
+			
+	-3- php artisan make:controller StripeController
+	
+	-4- 
