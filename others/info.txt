@@ -6,9 +6,15 @@
 
 	- github: https://github.com/Shahed-Chy-Suzan/stripe-laravel
 	- resourche: 
-				-- https://www.itsolutionstuff.com/post/laravel-57-stripe-payment-gateway-integration-exampleexample.html
-				-- https://www.positronx.io/integrate-stripe-payment-gateway-in-laravel-application/
-	
+				-blog:--
+						-- https://www.itsolutionstuff.com/post/laravel-57-stripe-payment-gateway-integration-exampleexample.html
+						-- https://www.positronx.io/integrate-stripe-payment-gateway-in-laravel-application/
+				-Youtube:--
+						-- https://www.youtube.com/watch?v=-3itA1ZXF6U
+						
+	-- stripe er payment er design ta paowar jonno amra stripe er documentaion er site e giye(not main site page) e diye search korbo "Checkout migration guide" likhe, then okhane sob details code chole asbe.
+			-- link: https://stripe.com/docs/payments/checkout/migration?lang=php#connect
+			-- link: https://stripe.com/docs/payments/checkout/migration#client-products
 	
 	
 	-1- composer require stripe/stripe-php

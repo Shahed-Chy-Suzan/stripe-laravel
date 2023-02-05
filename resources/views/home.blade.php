@@ -42,7 +42,7 @@
                     <a href="{{url('/')}}" class="text-center">go back to Home</a>
                 </div>
 
-                
+
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <div class="row text-center">
@@ -52,10 +52,10 @@
                     <div class="panel-body">
 
                         @if (Session::has('success'))
-                        <div class="alert alert-success text-center">
-                            <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
-                            <p>{{ Session::get('success') }}</p>
-                        </div>
+                            <div class="alert alert-success text-center">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                                <p>{{ Session::get('success') }}</p>
+                            </div>
                         @endif
 
                         <form role="form"

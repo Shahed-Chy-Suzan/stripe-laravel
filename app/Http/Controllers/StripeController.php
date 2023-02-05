@@ -13,6 +13,11 @@ class StripeController extends Controller
         return view('home');
     }
 
+    public function handleGetModal()
+    {
+        return view('home2-modal');
+    }
+
     /**
      * handling payment with POST
      */
@@ -20,11 +25,14 @@ class StripeController extends Controller
     {
         Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
         Stripe\Charge::create ([
-                "amount" => 100 * 150,
-                "currency" => "inr",
+                "amount" => 100 * 200,
+                "currency" => "USD",
                 "source" => $request->stripeToken,
                 "description" => "Making test payment."
         ]);
+
+        // $charge = \Stripe\Charge::create([ ... ... ... ]);
+        // dd($charge);
 
         Session::flash('success', 'Payment has been successfully processed.');
 

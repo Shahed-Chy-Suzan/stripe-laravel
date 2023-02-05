@@ -39,7 +39,14 @@
 <!--------------------------- fgfg ---------------------------------------------->
 
                 <h2 class="text-gray-900 dark:text-white">Stripe Payment Gateway Integration</h2>
-                <a href="{{url('stripe-payment')}}" class="text-danger">Click here to "goto stripe payment page"</a>
+                <ol class="text-danger">
+                    <li>
+                        <a href="{{url('stripe-payment')}}">Click here to "goto stripe payment page"</a>
+                    </li>
+                    <li>
+                        <a href="{{url('stripe-payment-modal')}}">Click here to "goto stripe payment with Modal"</a>
+                    </li>
+                </ol>
 
 <!-------------------------- fgfg ----------------------------------------------->
 
